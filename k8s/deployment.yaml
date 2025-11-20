@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-cloud-app
+  labels:
+    app: multi-cloud-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: multi-cloud-app
+  template:
+    metadata:
+      labels:
+        app: multi-cloud-app
+    spec:
+      containers:
+        - name: app
+          image: rahul/multi-cloud-app:latest   # replace with your dockerhub/repo
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: VERSION
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app.kubernetes.io/version'] || "v1"
