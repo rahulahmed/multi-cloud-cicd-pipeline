@@ -16,7 +16,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push
         run: |
-          cd app
+          cd app/src
           IMAGE=${{ secrets.DOCKER_USERNAME }}/multi-cloud-app
           docker build -t $IMAGE:latest -t $IMAGE:${{ github.sha }} .
           docker push $IMAGE:latest
