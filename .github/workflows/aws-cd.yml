@@ -1,0 +1,26 @@
+name: CD - Deploy to AWS EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-ec2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT }}
+          script: |
+            set -e
+            IMAGE=${{ secrets.DOCKER_USERNAME }}/multi-cloud-app:latest
+            docker pull $IMAGE
+            docker stop multi-cloud-app || true
+            docker rm multi-cloud-app || true
+            docker run -d --name multi-cloud-app -p 80:3000 --restart unless-stopped $IMAGE
+            echo "Deployed multi-cloud-app on EC2"
